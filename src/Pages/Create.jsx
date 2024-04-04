@@ -1,6 +1,40 @@
-import React from 'react'
+import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
+import UserApi from '../API/UserApi'
 
 function Create() {
+
+    const [user,setUser] = useState({
+        name: "",
+        email: "",
+        mobile: ""
+    })
+
+    const navigate = useNavigate()
+
+    const readInput = async(e) => {
+        const {name,value} = e.target
+        setUser({...user, [name]:value })
+    }
+
+    const submitHandler = async (e) => {
+        e.preventDefault()
+        try {
+            console.log(`new user =`,user)
+            await UserApi.craeteUser(user)
+                .then(res => {
+                    toast.success(res.data.msg)
+                    navigate(`/`)
+                }).catch(err => {
+                    toast.error(err.response.data.msg)
+                })
+        }catch (err){
+            toast.error(err.message)
+        }
+
+    }
+
   return (
     <div className='container'>
         <div className="row">
@@ -13,20 +47,20 @@ function Create() {
             <div className="col-md-6 offset-md-3">
                 <div className="card">
                     <div className="card-body">
-                        <form autoComplete='off'>
+                        <form autoComplete='off' onSubmit={submitHandler}>
                             <div className="form-group mt-2">
                                 <label htmlFor="name">Name</label>
-                                <input type="text " name='name' id='name' className='form-control' required/>
+                                <input type="text " value={user.name} onChange={readInput} name='name' id='name' className='form-control' required/>
                             </div>
 
                             <div className="form-group mt-2">
                                 <label htmlFor="email">Email</label>
-                                <input type="email " name='email' id='email' className='form-control' required/>
+                                <input type="email " value={user.email} onChange={readInput} name='email' id='email' className='form-control' required/>
                             </div>
 
                             <div className="form-group mt-2">
                                 <label htmlFor="mobile">Mobile</label>
-                                <input type="number " name='mobile' id='mobile' className='form-control' required/>
+                                <input type="number " value={user.mobile} onChange={readInput} name='mobile' id='mobile' className='form-control' required/>
                             </div>
 
                             <div className="form-group mt-2">
